@@ -1,0 +1,179 @@
+from collections.abc import Iterable
+import math as M
+
+
+def _valid_input(val) -> bool:
+    return isinstance(val, (int, float))
+
+
+class Dual:
+    """
+    Dual number: a + b*ε  where ε² = 0 and ε ≠ 0.
+    """
+    def __init__(self, *args) -> None:
+        self.real: float = 0.0
+        self.dual: float = 0.0
+
+        match len(args):
+            case 0:
+                return
+
+            case 1:
+                arg = args[0]
+                if isinstance(arg, Dual):
+                    self.real, self.dual = arg.real, arg.dual
+
+                elif isinstance(arg, (int, float)):
+                    self.real = float(arg)
+
+                elif isinstance(arg, Iterable):
+                    items = list(arg)
+                    if len(items) == 2 and all(_valid_input(x) for x in items): self.real, self.dual = float(items[0]), float(items[1])
+                    else: raise ValueError("Iterable argument must contain exactly two real numbers.")
+                
+                else:
+                    raise TypeError(f"Unsupported argument type: {type(arg)!r}")
+
+            case 2:
+                a, b = args
+                if not (_valid_input(a) and _valid_input(b)): raise ValueError("Both arguments must be real numbers (int or float).")
+                self.real, self.dual = float(a), float(b)
+
+            case _:
+                raise ValueError("Dual() accepts 0, 1, or 2 arguments.")
+
+    # Representation
+
+    def __repr__(self) -> str:
+        return f"Dual({self.real}, {self.dual})"
+
+    def __str__(self) -> str:
+        sign = "+" if self.dual >= 0 else "-"
+        return f"{self.real} {sign} {abs(self.dual)}ε"
+    
+    # Absolute Value (Norm)
+
+    def __abs__(self) -> float: return abs(self.real)
+
+    # Add
+
+    def __add__(self, other: "Dual | int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(self.real + other, self.dual)
+        if isinstance(other, Dual):
+            return Dual(self.real + other.real, self.dual + other.dual)
+        return NotImplemented
+
+    def __radd__(self, other: "int | float") -> "Dual": return self.__add__(other)
+
+    # Sub
+
+    def __sub__(self, other: "Dual | int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(self.real - other, self.dual)
+        if isinstance(other, Dual):
+            return Dual(self.real - other.real, self.dual - other.dual)
+        return NotImplemented
+
+    def __rsub__(self, other: "int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(other - self.real, -self.dual)
+        return NotImplemented
+    
+    # Mult
+
+    def __mul__(self, other: "Dual | int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(self.real * other, self.dual * other)
+        if isinstance(other, Dual):
+            return Dual(
+                self.real * other.real, 
+                self.real * other.dual + self.dual * other.real
+                )
+        return NotImplemented
+
+    def __rmul__(self, other: "int | float") -> "Dual": return self.__mul__(other)
+
+    # Unary
+
+    def __neg__(self) -> "Dual":
+        return Dual(-self.real, -self.dual)
+
+    def __pos__(self) -> "Dual":
+        return Dual(self.real, self.dual)
+
+    # Equality
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Dual):
+            return self.real == other.real and self.dual == other.dual
+        if isinstance(other, (int, float)):
+            return self.real == other and self.dual == 0.0
+        return NotImplemented
+
+    def __ne__(self, other: object) -> bool:
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return result
+        return not result
+
+    # Inequality
+
+    def __lt__(self, other: "Dual | int | float") -> bool:
+        if isinstance(other, (int, float)):
+            other = Dual(other, 0.0)
+
+        if isinstance(other, Dual):
+            if self.real != other.real:
+                return self.real < other.real
+            return self.dual < other.dual
+        return NotImplemented
+
+    def __le__(self, other: "Dual | int | float") -> bool:
+        if isinstance(other, (int, float)):
+            other = Dual(other, 0.0)
+
+        if isinstance(other, Dual):
+            if self.real != other.real:
+                return self.real < other.real
+            return self.dual <= other.dual
+        return NotImplemented
+
+    def __gt__(self, other: "Dual | int | float") -> bool:
+        if isinstance(other, (int, float)):
+            other = Dual(other, 0.0)
+
+        if isinstance(other, Dual):
+            if self.real != other.real:
+                return self.real > other.real
+            return self.dual > other.dual
+        return NotImplemented
+
+    def __ge__(self, other: "Dual | int | float") -> bool:
+        if isinstance(other, (int, float)):
+            other = Dual(other, 0.0)
+
+        if isinstance(other, Dual):
+            if self.real != other.real:
+                return self.real > other.real
+            return self.dual >= other.dual
+        return NotImplemented
+
+    # Hashing
+
+    def __hash__(self) -> int:
+        return hash((self.real, self.dual))
+    
+    # Custom Function
+
+    def exp(self) -> "Dual":
+        e_a = M.exp(self.real)
+        return Dual(e_a, e_a*self.dual)
+    
+    def sin(self) -> "Dual":
+        return Dual(M.sin(self.real), self.dual * M.cos(self.real))
+    
+    def cos(self) -> "Dual":
+        return Dual(M.cos(self.real), -self.dual * M.sin(self.real))
+        
+
