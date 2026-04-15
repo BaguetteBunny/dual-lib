@@ -94,6 +94,55 @@ class Dual:
 
     def __rmul__(self, other: "int | float") -> "Dual": return self.__mul__(other)
 
+    # True Div
+
+    def __truediv__(self, other: "Dual | int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(self.real / other, self.dual / other)
+        if isinstance(other, Dual):
+            return Dual(
+                self.real / other.real, 
+                (self.dual * other.real - self.real * other.dual) / (other.real**2)
+                )
+        return NotImplemented
+    
+    def __rtruediv__(self, other: "int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(other, 0) / self
+        return NotImplemented
+    
+    # Modulus
+
+    def __mod__(self, other: "Dual | int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(self.real % other, self.dual)
+        if isinstance(other, Dual):
+            return Dual(self.real % other.real, self.dual - other.dual * self.real // other.real)
+        return NotImplemented
+    
+    def __rmod__(self, other: "int | float") -> float:
+        if isinstance(other, (int, float)):
+            return Dual(other % self.real, -(other // self.real) * self.dual)
+        return NotImplemented
+    
+    # Floor Division
+
+    def __floordiv__(self, other: "Dual | int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(self.real // other, 0)
+        if isinstance(other, Dual):
+            return Dual(self.real // other.real, 0)
+        return NotImplemented
+    
+    def __rfloordiv__(self, other: "int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            return Dual(other // self.real, 0)
+        return NotImplemented
+    
+    # Divmod
+
+    def __divmod__(self, other: "Dual | int | float") -> tuple["Dual"]: return self // other, self % other
+
     # Unary
 
     def __neg__(self) -> "Dual":
