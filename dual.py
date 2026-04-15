@@ -175,5 +175,8 @@ class Dual:
     
     def cos(self) -> "Dual":
         return Dual(M.cos(self.real), -self.dual * M.sin(self.real))
+    
+    def log(self, base: float = M.e) -> "Dual":
+        return Dual(M.log(self.real, base), self.dual/(M.log(base) * self.real))
         
 
