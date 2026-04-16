@@ -219,13 +219,63 @@ class Dual:
         e_a = M.exp(self.real)
         return Dual(e_a, e_a*self.dual)
     
-    def sin(self) -> "Dual":
-        return Dual(M.sin(self.real), self.dual * M.cos(self.real))
-    
-    def cos(self) -> "Dual":
-        return Dual(M.cos(self.real), -self.dual * M.sin(self.real))
-    
     def log(self, base: float = M.e) -> "Dual":
         return Dual(M.log(self.real, base), self.dual/(M.log(base) * self.real))
         
+    # Trigonometric Functions
 
+    def sin(self) -> "Dual": return Dual(M.sin(self.real), self.dual * M.cos(self.real))
+    
+    def cos(self) -> "Dual": return Dual(M.cos(self.real), -self.dual * M.sin(self.real))
+    
+    def tan(self) -> "Dual": return Dual(M.tan(self.real), self.dual / M.cos(self.real)**2)
+
+    def sec(self) -> "Dual":
+        sec_a = 1 / M.cos(self.real)
+        return Dual(sec_a, self.dual * sec_a * M.tan(self.real))
+
+    def csc(self) -> "Dual":
+        csc_a = 1 / M.sin(self.real)
+        return Dual(csc_a, -self.dual * csc_a * (M.cos(self.real) / M.sin(self.real)))
+
+    def cot(self) -> "Dual": return Dual(M.cos(self.real) / M.sin(self.real), -self.dual / M.sin(self.real)**2)
+
+    def asin(self) -> "Dual": return Dual(M.asin(self.real), self.dual / M.sqrt(1 - self.real**2))
+
+    def acos(self) -> "Dual": return Dual(M.acos(self.real), -self.dual / M.sqrt(1 - self.real**2))
+
+    def atan(self) -> "Dual": return Dual(M.atan(self.real), self.dual / (1 + self.real**2))
+
+    def asec(self) -> "Dual": return Dual(M.acos(1 / self.real), self.dual / (abs(self.real) * M.sqrt(self.real**2 - 1)))
+
+    def acsc(self) -> "Dual": return Dual(M.asin(1 / self.real), -self.dual / (abs(self.real) * M.sqrt(self.real**2 - 1)))
+
+    def acot(self) -> "Dual":  return Dual(M.pi/2 - M.atan(self.real), -self.dual / (1 + self.real**2))
+
+    def sinh(self) -> "Dual": return Dual(M.sinh(self.real), self.dual * M.cosh(self.real))
+
+    def cosh(self) -> "Dual": return Dual(M.cosh(self.real), self.dual * M.sinh(self.real))
+
+    def tanh(self) -> "Dual": return Dual(M.tanh(self.real), self.dual / M.cosh(self.real)**2)
+
+    def sech(self) -> "Dual":
+        sech_a = 1 / M.cosh(self.real)
+        return Dual(sech_a, -self.dual * sech_a * M.tanh(self.real))
+
+    def csch(self) -> "Dual":
+        csch_a = 1 / M.sinh(self.real)
+        return Dual(csch_a, -self.dual * csch_a * (M.cosh(self.real) / M.sinh(self.real)))
+
+    def coth(self) -> "Dual": return Dual(M.cosh(self.real) / M.sinh(self.real), -self.dual / M.sinh(self.real)**2)
+
+    def asinh(self) -> "Dual": return Dual(M.asinh(self.real), self.dual / M.sqrt(self.real**2 + 1))
+
+    def acosh(self) -> "Dual": return Dual(M.acosh(self.real), self.dual / M.sqrt(self.real**2 - 1))
+
+    def atanh(self) -> "Dual": return Dual(M.atanh(self.real), self.dual / (1 - self.real**2))
+
+    def asech(self) -> "Dual":  return Dual(M.acosh(1 / self.real), -self.dual / (self.real * M.sqrt(1 - self.real**2)))
+
+    def acsch(self) -> "Dual": return Dual(M.asinh(1 / self.real), -self.dual / (abs(self.real) * M.sqrt(1 + self.real**2)))
+
+    def acoth(self) -> "Dual": return Dual(M.atanh(1 / self.real), self.dual / (1 - self.real**2))
