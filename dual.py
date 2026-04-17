@@ -143,6 +143,22 @@ class Dual:
 
     def __divmod__(self, other: "Dual | int | float") -> tuple["Dual"]: return self // other, self % other
 
+    # Pow
+
+    def __pow__(self, other):
+        if isinstance(other, (int, float)):
+            return Dual(self.real**other, self.dual * other * self.real**(other - 1))
+        if isinstance(other, Dual):
+            real = self.real ** other.real
+            return Dual(real, self.dual * other.real * self.real**(other.real - 1) + other.dual * real * M.log(self.real))
+        return NotImplemented
+    
+    def __rpow__(self, other: "int | float") -> "Dual":
+        if isinstance(other, (int, float)):
+            real = other ** self.real
+            return Dual(real, self.dual * real * M.log(other))
+        return NotImplemented
+
     # Unary
 
     def __neg__(self) -> "Dual":
