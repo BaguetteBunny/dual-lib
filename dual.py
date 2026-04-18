@@ -5,7 +5,6 @@ import math as M
 def _valid_input(val) -> bool:
     return isinstance(val, (int, float))
 
-
 class Dual:
     """
     Dual number: a + b*ε  where ε² = 0 and ε ≠ 0.
@@ -48,8 +47,11 @@ class Dual:
         return f"Dual({self.real}, {self.dual})"
 
     def __str__(self) -> str:
-        sign = "+" if self.dual >= 0 else "-"
-        return f"{self.real} {sign} {abs(self.dual)}ε"
+        if self.real == 0:
+            return f"{self.dual}ε" if self.dual != 0 else "0"
+        else:
+            sign = "+" if self.dual >= 0 else "-"
+            return f"{self.real} {sign} {abs(self.dual)}ε"
     
     # Absolute Value (Norm)
 
@@ -295,3 +297,18 @@ class Dual:
     def acsch(self) -> "Dual": return Dual(M.asinh(1 / self.real), -self.dual / (abs(self.real) * M.sqrt(1 + self.real**2)))
 
     def acoth(self) -> "Dual": return Dual(M.atanh(1 / self.real), self.dual / (1 - self.real**2))
+
+class Epsilon(Dual):
+    """
+    Unit Epsilon: ε where ε² = 0 and ε ≠ 0.
+    """
+    def __init__(self):
+        self.real = 0
+        self.dual = 1
+
+    def __repr__(self) -> str:
+        return f"Epsilon()"
+
+    def __str__(self) -> str:
+        return "ε"
+    
