@@ -5,6 +5,22 @@ import math as M
 def _valid_input(val) -> bool:
     return isinstance(val, (int, float))
 
+def _round_diff(x: "int | float") -> int:
+    if x == 0.5: ValueError("round() dual part undefined for real part half integer (Dirac Delta)")
+    return 0
+
+def _floor_diff(x: "int | float") -> int:
+    if x == int(x): ValueError("floor() dual part undefined for real part integer (Dirac Delta)")
+    return 0
+
+def _ceil_diff(x: "int | float") -> int:
+    if x == int(x): ValueError("ceil() dual part undefined for real part integer (Dirac Delta)")
+    return 0
+
+def _sign(x: "int | float") -> int:
+    if x == 0: raise ValueError("sign() dual part undefined when real part is 0 (Dirac Delta)")
+    return (x > 0) - (x < 0)
+
 class Dual:
     """
     Dual number: a + b*ε  where ε² = 0 and ε ≠ 0.
@@ -53,10 +69,6 @@ class Dual:
             sign = "+" if self.dual >= 0 else "-"
             return f"{self.real} {sign} {abs(self.dual)}ε"
     
-    # Absolute Value (Norm)
-
-    def __abs__(self) -> float: return abs(self.real)
-
     # Add
 
     def __add__(self, other: "Dual | int | float") -> "Dual":
@@ -231,6 +243,26 @@ class Dual:
     def __hash__(self) -> int:
         return hash((self.real, self.dual))
     
+    # Absolute Value
+
+    def __abs__(self) -> "Dual": return Dual(abs(self.real), self.dual * _sign(self.real))
+
+    # Rounding
+
+    def ceil(self) -> "Dual": return Dual(M.ceil(self.real), _ceil_diff(self.dual))
+
+    def floor(self) -> "Dual": return Dual(M.floor(self.real), _floor_diff(self.dual))
+
+    def __round__(self, ndigits = None) -> "Dual": return Dual(round(self.real, ndigits), _round_diff(self.dual))
+
+    # Signum
+
+    def sign(self) -> "Dual": return Dual(_sign(self.real), 0)
+
+    # Norm
+
+    def norm(self) -> float: return abs(self.real)
+
     # Custom Function
 
     def exp(self) -> "Dual":
