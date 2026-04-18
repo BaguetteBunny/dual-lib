@@ -1,4 +1,4 @@
-from .main import Dual
+from .core import Dual
 
 def derivative(f, x) -> float:
     """

@@ -1,4 +1,4 @@
-from .main import Dual, Epsilon
+from .core import Dual, Epsilon
 from .differentiation import derivative, gradient, jacobian
 
 __all__ = [
