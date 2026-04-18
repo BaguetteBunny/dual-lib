@@ -59,8 +59,7 @@ class Dual:
 
     # Representation
 
-    def __repr__(self) -> str:
-        return f"Dual({self.real}, {self.dual})"
+    def __repr__(self) -> str: return f"Dual({self.real}, {self.dual})"
 
     def __str__(self) -> str:
         if self.real == 0:
@@ -69,6 +68,12 @@ class Dual:
             sign = "+" if self.dual >= 0 else "-"
             return f"{self.real} {sign} {abs(self.dual)}ε"
     
+    def __bool__(self) -> bool: return self.real != 0
+
+    def __int__(self) -> int: return int(self.real)
+
+    def __float__(self) -> float: return self.real
+
     # Add
 
     def __add__(self, other: "Dual | int | float") -> "Dual":
@@ -263,7 +268,7 @@ class Dual:
 
     def norm(self) -> float: return abs(self.real)
 
-    # Custom Function
+    # Other Function
 
     def exp(self) -> "Dual":
         e_a = M.exp(self.real)
