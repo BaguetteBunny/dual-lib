@@ -6,19 +6,19 @@ Number = Union[int, float]
 def _valid_input(val) -> bool:
     return isinstance(val, (int, float))
 
-def _round_diff(x: "int | float") -> int:
+def _round_diff(x: Number) -> int:
     if x == 0.5: ValueError("round() dual part undefined for real part half integer (Dirac Delta)")
     return 0
 
-def _floor_diff(x: "int | float") -> int:
+def _floor_diff(x: Number) -> int:
     if x == int(x): ValueError("floor() dual part undefined for real part integer (Dirac Delta)")
     return 0
 
-def _ceil_diff(x: "int | float") -> int:
+def _ceil_diff(x: Number) -> int:
     if x == int(x): ValueError("ceil() dual part undefined for real part integer (Dirac Delta)")
     return 0
 
-def _sign(x: "int | float") -> int:
+def _sign(x: Number) -> int:
     if x == 0: raise ValueError("sign() dual part undefined when real part is 0 (Dirac Delta)")
     return (x > 0) - (x < 0)
 
@@ -309,32 +309,32 @@ class Dual:
 
     # Add
 
-    def __add__(self, other: "Dual | int | float") -> "Dual":
+    def __add__(self, other: "Dual | Number") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real + other, self.dual)
         if isinstance(other, Dual):
             return Dual(self.real + other.real, self.dual + other.dual)
         return NotImplemented
 
-    def __radd__(self, other: "int | float") -> "Dual": return self.__add__(other)
+    def __radd__(self, other: Number) -> "Dual": return self.__add__(other)
 
     # Sub
 
-    def __sub__(self, other: "Dual | int | float") -> "Dual":
+    def __sub__(self, other: "Dual | Number") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real - other, self.dual)
         if isinstance(other, Dual):
             return Dual(self.real - other.real, self.dual - other.dual)
         return NotImplemented
 
-    def __rsub__(self, other: "int | float") -> "Dual":
+    def __rsub__(self, other: Number) -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(other - self.real, -self.dual)
         return NotImplemented
     
     # Mult
 
-    def __mul__(self, other: "Dual | int | float") -> "Dual":
+    def __mul__(self, other: "Dual | Number") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real * other, self.dual * other)
         if isinstance(other, Dual):
@@ -344,11 +344,11 @@ class Dual:
                 )
         return NotImplemented
 
-    def __rmul__(self, other: "int | float") -> "Dual": return self.__mul__(other)
+    def __rmul__(self, other: Number) -> "Dual": return self.__mul__(other)
 
     # Divisions
 
-    def __truediv__(self, other: "Dual | int | float") -> "Dual":
+    def __truediv__(self, other: "Dual | Number") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real / other, self.dual / other)
         if isinstance(other, Dual):
@@ -358,36 +358,36 @@ class Dual:
                 )
         return NotImplemented
     
-    def __rtruediv__(self, other: "int | float") -> "Dual":
+    def __rtruediv__(self, other: Number) -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(other, 0) / self
         return NotImplemented
     
-    def __mod__(self, other: "Dual | int | float") -> "Dual":
+    def __mod__(self, other: "Dual | Number") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real % other, self.dual)
         if isinstance(other, Dual):
             return Dual(self.real % other.real, self.dual - other.dual * self.real // other.real)
         return NotImplemented
     
-    def __rmod__(self, other: "int | float") -> float:
+    def __rmod__(self, other: Number) -> float:
         if isinstance(other, (int, float)):
             return Dual(other % self.real, -(other // self.real) * self.dual)
         return NotImplemented
     
-    def __floordiv__(self, other: "Dual | int | float") -> "Dual":
+    def __floordiv__(self, other: "Dual | Number") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real // other, 0)
         if isinstance(other, Dual):
             return Dual(self.real // other.real, 0)
         return NotImplemented
     
-    def __rfloordiv__(self, other: "int | float") -> "Dual":
+    def __rfloordiv__(self, other: Number) -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(other // self.real, 0)
         return NotImplemented
     
-    def __divmod__(self, other: "Dual | int | float") -> tuple["Dual"]: return self // other, self % other
+    def __divmod__(self, other: "Dual | Number") -> tuple["Dual"]: return self // other, self % other
 
     # Pow
 
@@ -399,7 +399,7 @@ class Dual:
             return Dual(real, self.dual * other.real * self.real**(other.real - 1) + other.dual * real * M.log(self.real))
         return NotImplemented
     
-    def __rpow__(self, other: "int | float") -> "Dual":
+    def __rpow__(self, other: Number) -> "Dual":
         if isinstance(other, (int, float)):
             real = other ** self.real
             return Dual(real, self.dual * real * M.log(other))
@@ -428,7 +428,7 @@ class Dual:
             return result
         return not result
 
-    def __lt__(self, other: "Dual | int | float") -> bool:
+    def __lt__(self, other: "Dual | Number") -> bool:
         if isinstance(other, (int, float)):
             other = Dual(other, 0.0)
 
@@ -438,7 +438,7 @@ class Dual:
             return self.dual < other.dual
         return NotImplemented
 
-    def __le__(self, other: "Dual | int | float") -> bool:
+    def __le__(self, other: "Dual | Number") -> bool:
         if isinstance(other, (int, float)):
             other = Dual(other, 0.0)
 
@@ -448,7 +448,7 @@ class Dual:
             return self.dual <= other.dual
         return NotImplemented
 
-    def __gt__(self, other: "Dual | int | float") -> bool:
+    def __gt__(self, other: "Dual | Number") -> bool:
         if isinstance(other, (int, float)):
             other = Dual(other, 0.0)
 
@@ -458,7 +458,7 @@ class Dual:
             return self.dual > other.dual
         return NotImplemented
 
-    def __ge__(self, other: "Dual | int | float") -> bool:
+    def __ge__(self, other: "Dual | Number") -> bool:
         if isinstance(other, (int, float)):
             other = Dual(other, 0.0)
 
