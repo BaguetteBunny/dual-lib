@@ -21,6 +21,24 @@ def _sign(x: "int | float") -> int:
     if x == 0: raise ValueError("sign() dual part undefined when real part is 0 (Dirac Delta)")
     return (x > 0) - (x < 0)
 
+
+def derivative(f, x):
+    return f(Dual(x, 1)).dual
+
+def gradient(f, *args):
+    return [f(*[Dual(a, 1) if i == j else Dual(a, 0)
+                for j, a in enumerate(args)]).dual
+            for i in range(len(args))]
+
+
+def jacobian(f, *args):
+    rows = []
+    for i in range(len(args)):
+        outputs = f(*[Dual(a, 1) if i == j else Dual(a, 0)
+                      for j, a in enumerate(args)])
+        rows.append([out.dual for out in outputs])
+    return rows
+
 class Dual:
     """
     Dual number: a + b*ε  where ε² = 0 and ε ≠ 0.
