@@ -113,7 +113,7 @@ class Dual:
 
     def __rmul__(self, other: "int | float") -> "Dual": return self.__mul__(other)
 
-    # True Div
+    # Divisions
 
     def __truediv__(self, other: "Dual | int | float") -> "Dual":
         if isinstance(other, (int, float)):
@@ -130,8 +130,6 @@ class Dual:
             return Dual(other, 0) / self
         return NotImplemented
     
-    # Modulus
-
     def __mod__(self, other: "Dual | int | float") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real % other, self.dual)
@@ -144,8 +142,6 @@ class Dual:
             return Dual(other % self.real, -(other // self.real) * self.dual)
         return NotImplemented
     
-    # Floor Division
-
     def __floordiv__(self, other: "Dual | int | float") -> "Dual":
         if isinstance(other, (int, float)):
             return Dual(self.real // other, 0)
@@ -158,8 +154,6 @@ class Dual:
             return Dual(other // self.real, 0)
         return NotImplemented
     
-    # Divmod
-
     def __divmod__(self, other: "Dual | int | float") -> tuple["Dual"]: return self // other, self % other
 
     # Pow
@@ -186,7 +180,7 @@ class Dual:
     def __pos__(self) -> "Dual":
         return Dual(self.real, self.dual)
 
-    # Equality
+    # Equality & Inequality
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Dual):
@@ -200,8 +194,6 @@ class Dual:
         if result is NotImplemented:
             return result
         return not result
-
-    # Inequality
 
     def __lt__(self, other: "Dual | int | float") -> bool:
         if isinstance(other, (int, float)):
@@ -248,27 +240,17 @@ class Dual:
     def __hash__(self) -> int:
         return hash((self.real, self.dual))
     
-    # Absolute Value
-
-    def __abs__(self) -> "Dual": return Dual(abs(self.real), self.dual * _sign(self.real))
-
-    # Rounding
-
     def ceil(self) -> "Dual": return Dual(M.ceil(self.real), _ceil_diff(self.dual))
 
     def floor(self) -> "Dual": return Dual(M.floor(self.real), _floor_diff(self.dual))
 
     def __round__(self, ndigits = None) -> "Dual": return Dual(round(self.real, ndigits), _round_diff(self.dual))
 
-    # Signum
-
-    def sign(self) -> "Dual": return Dual(_sign(self.real), 0)
-
-    # Norm
-
-    def norm(self) -> float: return abs(self.real)
+    def __abs__(self) -> "Dual": return Dual(abs(self.real), self.dual * _sign(self.real))
 
     # Other Function
+
+    def sign(self) -> "Dual": return Dual(_sign(self.real), 0)
 
     def exp(self) -> "Dual":
         e_a = M.exp(self.real)
@@ -334,6 +316,12 @@ class Dual:
     def acsch(self) -> "Dual": return Dual(M.asinh(1 / self.real), -self.dual / (abs(self.real) * M.sqrt(1 + self.real**2)))
 
     def acoth(self) -> "Dual": return Dual(M.atanh(1 / self.real), self.dual / (1 - self.real**2))
+
+    # Misc
+
+    def norm(self) -> float: return abs(self.real)
+
+    def astuple(self) -> tuple: return self.real, self.dual
 
 class Epsilon(Dual):
     """
