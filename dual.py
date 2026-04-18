@@ -1,6 +1,7 @@
-from collections.abc import Iterable
+from typing import Iterable, Union
 import math as M
 
+Number = Union[int, float]
 
 def _valid_input(val) -> bool:
     return isinstance(val, (int, float))
@@ -22,15 +23,94 @@ def _sign(x: "int | float") -> int:
     return (x > 0) - (x < 0)
 
 
-def derivative(f, x):
+def derivative(f, x) -> float:
+    """
+    Compute the derivative of a scalar function at a point using dual numbers.
+
+    Evaluates f at the dual number (x + ε), where the dual part of the result
+    equals f'(x) exactly, with no numerical approximation error.
+
+    Parameters
+    ----------
+    f : callable
+        A scalar-valued function of one variable, written using Dual-compatible
+        operations (e.g. ``x.sin()``, ``x ** 2``).
+    x : int or float
+        The point at which to evaluate the derivative.
+
+    Returns
+    -------
+    float
+        The exact derivative f'(x).
+
+    Examples
+    --------
+    >>> derivative(lambda x: x.exp(), 1)
+    2.718281828459045  # e^1, since d/dx e^x = e^x
+    """
     return f(Dual(x, 1)).dual
 
-def gradient(f, *args):
+def gradient(f, *args) -> list[float]:
+    """
+    Compute the gradient of a scalar function at a point using dual numbers.
+
+    Performs one forward pass per input variable, each time seeding a single
+    argument with dual part 1 and the rest with dual part 0. The dual part of
+    each output gives the corresponding partial derivative.
+
+    Parameters
+    ----------
+    f : callable
+        A scalar-valued function of n variables, written using Dual-compatible
+        operations.
+    *args : int or float
+        The point (x₁, x₂, ..., xₙ) at which to evaluate the gradient.
+
+    Returns
+    -------
+    list[float]
+        A vector [∂f/∂x₁, ∂f/∂x₂, ..., ∂f/∂xₙ] of length n.
+
+    Examples
+    --------
+    >>> gradient(lambda x, y: x**2 + x*y, 3, 4)
+    [10.0, 3.0]  # ∂f/∂x = 2x+y = 10, ∂f/∂y = x = 3
+    """
     return [f(*[Dual(a, 1) if i == j else Dual(a, 0)
                 for j, a in enumerate(args)]).dual
             for i in range(len(args))]
 
-def jacobian(f, *args):
+def jacobian(f, *args) -> list[list[float]]:
+    """
+    Compute the Jacobian matrix of a vector function at a point using dual numbers.
+
+    Performs one forward pass per input variable, each time seeding a single
+    argument with dual part 1 and the rest with dual part 0. The dual parts of
+    all outputs for that pass form one row of the Jacobian.
+
+    The resulting matrix J has shape (n, m) where n is the number of input
+    variables and m is the number of output variables, with J[i][j] = ∂fⱼ/∂xᵢ.
+
+    Parameters
+    ----------
+    f : callable
+        A vector-valued function of n variables returning a tuple or list of m
+        Dual numbers, written using Dual-compatible operations.
+    *args : int or float
+        The point (x₁, x₂, ..., xₙ) at which to evaluate the Jacobian.
+
+    Returns
+    -------
+    list[list[float]]
+        An n×m matrix where entry [i][j] is ∂fⱼ/∂xᵢ.
+
+    Examples
+    --------
+    >>> jacobian(lambda x, y, z: (x**2+y+z, x*y, z+x), 2, 3, 4)
+    [[4, 3, 1],   # ∂/∂x: 2x=4, y=3, 1
+     [1, 2, 0],   # ∂/∂y: 1, x=2, 0
+     [1, 0, 1]]   # ∂/∂z: 1, 0, 1
+    """
     rows = []
     for i in range(len(args)):
         outputs = f(*[Dual(a, 1) if i == j else Dual(a, 0)
@@ -40,7 +120,143 @@ def jacobian(f, *args):
 
 class Dual:
     """
-    Dual number: a + b*ε  where ε² = 0 and ε ≠ 0.
+    A dual number of the form a + bε, where ε is the dual unit.
+
+    Dual numbers extend the real numbers by adjoining a nilpotent unit ε
+    satisfying ε² = 0. This single property makes them exact, algebraic
+    differentiators — evaluating f(a + ε) yields f(a) + f'(a)ε with no
+    floating point approximation, unlike finite differences.
+
+    Parameters
+    ----------
+    real : int or float
+        The real component a.
+    dual : int or float
+        The dual component b, the coefficient of ε.
+
+    Attributes
+    ----------
+    real : float
+        The real part a of the dual number a + bε.
+    dual : float
+        The dual part b of the dual number a + bε.
+
+    Properties
+    ----------
+    ε² = 0
+        The defining nilpotency property. All higher powers of ε vanish,
+        meaning dual number arithmetic is exact and closed — no infinite
+        series, no approximation.
+
+    f(a + bε) = f(a) + b·f'(a)ε
+        The fundamental identity underlying automatic differentiation.
+        Any differentiable function applied to a dual number yields the
+        function value in the real part and the scaled derivative in the
+        dual part.
+
+    Arithmetic Operations
+    ---------------------
+    Addition:
+        (a + bε) + (c + dε) = (a+c) + (b+d)ε
+
+    Subtraction:
+        (a + bε) - (c + dε) = (a-c) + (b-d)ε
+
+    Multiplication:
+        (a + bε)(c + dε) = ac + (ad+bc)ε        [ε² term vanishes]
+
+    Division:
+        (a + bε) / (c + dε) = a/c + (bc-ad)/c²ε
+
+    Power (scalar):
+        (a + bε)^n = aⁿ + b·n·aⁿ⁻¹ε
+
+    Power (dual):
+        (a + bε)^(c+dε) = aᶜ + (bc·aᶜ⁻¹ + d·aᶜ·ln(a))ε
+
+    Floor division:
+        (a + bε) // (c + dε) = ⌊a/c⌋              [dual part annihilated]
+
+    Modulo:
+        (a + bε) % (c + dε) = (a%c) + (b - d·⌊a/c⌋)ε
+
+    Examples
+    --------
+    Constructing dual numbers:
+
+    >>> x = Dual(3, 1)  # 3 + 1ε
+    >>> y = Dual(4, 2)  # 4 + 2ε
+
+    Basic arithmetic:
+
+    >>> x + y
+    Dual(7, 3)
+
+    >>> x * y
+    Dual(12, 10)  # real: 3*4, dual: 3*2 + 1*4
+
+    >>> x / y
+    Dual(0.75, -0.125)
+
+    Computing a derivative — seed dual part with 1:
+
+    >>> f = lambda x: x ** 3
+    >>> f(Dual(2, 1))
+    Dual(8, 12)  # f(2)=8, f'(2)=3*2²=12
+
+    Composing functions — chain rule is automatic:
+
+    >>> g = lambda x: x.sin() * x ** 2
+    >>> g(Dual(1, 1))
+    Dual(0.8414709848, 1.6829419696)  # real: sin(1), dual: 2sin(1) + cos(1)
+
+    Mathematical functions:
+
+    >>> Dual(0, 1).sin()
+    Dual(0.0, 1.0)   # sin(0)=0, cos(0)=1
+
+    >>> Dual(1, 1).exp()
+    Dual(2.718, 2.718)  # e^1, derivative of e^x at x=1 is also e^1
+
+    Nilpotency:
+
+    >>> Dual(0, 1) ** 2
+    Dual(0, 0)  # ε² = 0
+
+    >>> Dual(0, 1) ** 3
+    Dual(0, 0)  # ε³ = 0
+
+    Singularities:
+
+    >>> Dual(0, 1).log()
+    ValueError  # ln(0) undefined
+
+    >>> Dual(math.pi/2, 1).tan()
+    ZeroDivisionError  # tan undefined at π/2
+
+    >>> Dual(1, 1).asin()
+    ValueError  # √(1-x²) = 0 at boundary
+
+    Notes
+    -----
+    The dual part should be interpreted as a directional derivative. Setting
+    dual=1 seeds the direction along x, so the output dual part gives the
+    derivative of f with respect to x. This is the foundation of forward-mode
+    automatic differentiation.
+
+    Dual numbers are not ordered beyond their real parts. Comparisons
+    (``<``, ``>``, ``<=``, ``>=``) operate on real parts only, and the dual
+    part carries no notion of magnitude or sign for ordering purposes.
+
+    Dual numbers with dual=0 behave identically to real numbers under all
+    operations. A Dual with both parts zero is the additive identity.
+
+    See Also
+    --------
+    Epsilon : The pure dual unit ε = Dual(0, 1).
+    derivative : Compute f'(x) using dual numbers.
+    gradient : Compute ∇f at a point using dual numbers.
+    jacobian : Compute the Jacobian matrix of a vector function.
     """
     def __init__(self, *args) -> None:
         self.real: float = 0.0
@@ -342,7 +558,15 @@ class Dual:
 
 class Epsilon(Dual):
     """
-    Unit Epsilon: ε where ε² = 0 and ε ≠ 0.
+    The pure dual unit ε, representing the dual number 0 + 1ε.
+
+    A convenience subclass of Dual with real=0 and dual=1 fixed. Epsilon
+    serves as the fundamental nilpotent unit of the dual number system,
+    satisfying the defining property ε² = 0.
+
+    Since Epsilon is a Dual with (real=0, dual=1), it inherits all Dual
+    arithmetic and mathematical operations unchanged. It exists purely for
+    notational clarity and convenience.
     """
     def __init__(self):
         self.real = 0
