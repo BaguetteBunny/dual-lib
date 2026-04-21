@@ -33,10 +33,34 @@ class Dual:
 
     Parameters
     ----------
-    real : int or float
-        The real component a.
-    dual : int or float
-        The dual component b, the coefficient of ε.
+    *args
+        Accepts 0, 1, or 2 arguments:
+
+        ``Dual()``
+            Constructs the zero dual number 0 + 0ε.
+
+        ``Dual(a)`` where a is int or float
+            Constructs a + 0ε. Dual part defaults to 0.
+
+        ``Dual(x)`` where x is Dual
+            Copy constructor. Returns a duplicate of x.
+
+        ``Dual(iterable)``
+            Constructs from any iterable of exactly two real numbers
+            (int or float), interpreted as (real, dual).
+            e.g. ``Dual([3, 4])`` → 3 + 4ε
+
+        ``Dual(a, b)`` where a, b are int or float
+            Constructs a + bε explicitly.
+
+    Raises
+    ------
+    TypeError
+        If a single argument of an unsupported type is passed.
+    ValueError
+        If more than 2 arguments are passed, if an iterable argument
+        does not contain exactly two real numbers, or if either of the
+        two-argument values is not a real number.
 
     Attributes
     ----------
