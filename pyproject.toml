@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dual"
+version = "1.0.0"
+dynamic = ["version"]
+requires-python = ">= 3.8"
+authors = [{name = "Louis Billaut", email = "louisbillaut30052007@gmail.com"}]
+license = "MIT"
+readme = "README.md"
+description = "Dual Number Library"
+keywords = ["dual", "derivative", "differentiation", "epsilon"]
+
+[project.urls]
+Repository = "https://github.com/BaguetteBunny/dual-lib"
+Documentation = "https://github.com/BaguetteBunny/dual-lib/blob/main/README.md"
+Changelog = "https://github.com/BaguetteBunny/dual-lib/blob/main/CHANGELOG.md"
+Issues = "https://github.com/BaguetteBunny/dual-lib/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
