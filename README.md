@@ -7,29 +7,6 @@
  
 ---
  
-## Table of Contents
- 
-- [What Are Dual Numbers?](#what-are-dual-numbers)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [The Dual Class](#the-dual-class)
-  - [Construction](#construction)
-  - [Arithmetic](#arithmetic)
-  - [Mathematical Functions](#mathematical-functions)
-  - [Trigonometric Functions](#trigonometric-functions)
-  - [Inverse Trigonometric Functions](#inverse-trigonometric-functions)
-  - [Hyperbolic Functions](#hyperbolic-functions)
-  - [Inverse Hyperbolic Functions](#inverse-hyperbolic-functions)
-- [The Epsilon Class](#the-epsilon-class)
-- [Automatic Differentiation](#automatic-differentiation)
-  - [derivative](#derivative)
-  - [gradient](#gradient)
-  - [jacobian](#jacobian)
-- [Accuracy](#accuracy)
-- [Limitations](#limitations)
-- [License](#license)
----
- 
 ## What Are Dual Numbers?
  
 Dual numbers extend the real numbers by adjoining a nilpotent unit **ε** (epsilon), satisfying the single defining property:
