@@ -22,6 +22,25 @@ def _sign(x: Number) -> int:
     if x == 0: raise ValueError("sign() dual part undefined when real part is 0 (Dirac Delta)")
     return (x > 0) - (x < 0)
 
+def _digamma(x: float) -> float:
+    """Approximates digamma ψ(x) = d/dx ln Γ(x)."""
+
+    # Case 1: x < 0: Reflection
+    if x < 0: return _digamma(1 - x) - M.pi / M.tan(M.pi * x)
+
+    result = 0.0
+
+    # Case 2: x <= 15: Recurrence Shift
+    while x <= 15:
+        result -= 1 / x
+        x += 1
+
+    # Case 3: x > 15: Series Expansion
+    r  = 1 / x
+    r2 = r * r
+    result += M.log(x) - 0.5 * r - (1/12) * r2 + (1/120) * r2**2 - (1/252) * r2**3 + (1/240) * r2**4 - (1/132) * r2**5
+    return result
+
 class Dual:
     """
     A dual number of the form a + bε, where ε is the dual unit.
@@ -419,6 +438,10 @@ class Dual:
     
     def log(self, base: float = M.e) -> "Dual":
         return Dual(M.log(self.real, base), self.dual/(M.log(base) * self.real))
+    
+    def gamma(self) -> "Dual":
+        gamma_a = M.gamma(self.real)
+        return Dual(gamma_a, self.dual * gamma_a * _digamma(self.real))
         
     # Trigonometric Functions
 
