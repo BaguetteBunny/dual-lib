@@ -30,7 +30,7 @@ for any differentiable function f. This means evaluating a function on a dual nu
 Clone the repository and install in editable mode:
  
 ```bash
-git clone https://github.com/yourname/dual-numbers.git
+git clone https://github.com/BaguetteBunny/dual-numbers.git
 cd dual-numbers
 pip install -e .
 ```
