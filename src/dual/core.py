@@ -41,6 +41,8 @@ def _digamma(x: float) -> float:
     result += M.log(x) - 0.5 * r - (1/12) * r2 + (1/120) * r2**2 - (1/252) * r2**3 + (1/240) * r2**4 - (1/132) * r2**5
     return result
 
+_DDX_ERF = lambda x: 2 / M.sqrt(M.pi) * M.exp(-x**2)
+
 class Dual:
     """
     A dual number of the form a + bε, where ε is the dual unit.
@@ -436,13 +438,16 @@ class Dual:
         e_a = M.exp(self.real)
         return Dual(e_a, e_a*self.dual)
     
-    def log(self, base: float = M.e) -> "Dual":
-        return Dual(M.log(self.real, base), self.dual/(M.log(base) * self.real))
+    def log(self, base: float = M.e) -> "Dual":  return Dual(M.log(self.real, base), self.dual/(M.log(base) * self.real))
     
     def gamma(self) -> "Dual":
         gamma_a = M.gamma(self.real)
         return Dual(gamma_a, self.dual * gamma_a * _digamma(self.real))
         
+    def erf(self) -> "Dual": return Dual(M.erf(self.real), self.dual * _DDX_ERF(self.real))
+
+    def erfc(self) -> "Dual": return Dual(M.erfc(self.real), -self.dual * _DDX_ERF(self.real))
+
     # Trigonometric Functions
 
     def sin(self) -> "Dual": return Dual(M.sin(self.real), self.dual * M.cos(self.real))
