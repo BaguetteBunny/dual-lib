@@ -1,4 +1,6 @@
 __pycache__
 .vscode
+dist
+dual.egg-info
 
 temp.py
