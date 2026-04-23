@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dual"
-version = "1.0.0"
 dynamic = ["version"]
 requires-python = ">= 3.8"
 authors = [{name = "Louis Billaut", email = "louisbillaut30052007@gmail.com"}]
