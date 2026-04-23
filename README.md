@@ -60,7 +60,7 @@ pip install -e .
 Then in your code:
  
 ```python
-from dual import Dual, Epsilon, dmath, derivative, gradient, jacobian, hessian
+from dual import Dual, Epsilon, derivative, gradient, jacobian
 ```
  
 ---
@@ -68,7 +68,7 @@ from dual import Dual, Epsilon, dmath, derivative, gradient, jacobian, hessian
 ## Quick Start
  
 ```python
-from dual import Dual, Epsilon, dmath, derivative, gradient, jacobian
+from dual import Dual, Epsilon, derivative, gradient, jacobian
  
 # --- Basic construction ---
 x = Dual(3, 1)       # 3 + 1ε  (seed for differentiation at x=3)
