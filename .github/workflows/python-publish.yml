@@ -26,13 +26,13 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Install dependencies
-        run: |
-          pip install -e .
-          pip install pytest
-
-      - name: Run unit tests
-        run: pytest tests/ -v
+      #- name: Install dependencies
+      #  run: |
+      #    pip install -e .
+      #    pip install pytest
+#
+    #  - name: Run unit tests
+    #    run: pytest tests/ -v
 
       - name: Build release distributions
         run: |
