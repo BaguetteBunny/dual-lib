@@ -7,15 +7,15 @@ def _valid_input(val) -> bool:
     return isinstance(val, (int, float))
 
 def _round_diff(x: Number) -> int:
-    if x == 0.5: ValueError("round() dual part undefined for real part half integer (Dirac Delta)")
+    if x == 0.5: raise ValueError("round() dual part undefined for real part half integer (Dirac Delta)")
     return 0
 
 def _floor_diff(x: Number) -> int:
-    if x == int(x): ValueError("floor() dual part undefined for real part integer (Dirac Delta)")
+    if x == int(x): raise ValueError("floor() dual part undefined for real part integer (Dirac Delta)")
     return 0
 
 def _ceil_diff(x: Number) -> int:
-    if x == int(x): ValueError("ceil() dual part undefined for real part integer (Dirac Delta)")
+    if x == int(x): raise ValueError("ceil() dual part undefined for real part integer (Dirac Delta)")
     return 0
 
 def _sign(x: Number) -> int:
@@ -454,7 +454,9 @@ class Dual:
     
     def cos(self) -> "Dual": return Dual(M.cos(self.real), -self.dual * M.sin(self.real))
     
-    def tan(self) -> "Dual": return Dual(M.tan(self.real), self.dual / M.cos(self.real)**2)
+    def tan(self) -> "Dual":
+        if self.real == M.pi/2: raise ValueError("Tangent is undefined at integer multiples of π/2")
+        return Dual(M.tan(self.real), self.dual / M.cos(self.real)**2)
 
     def sec(self) -> "Dual":
         sec_a = 1 / M.cos(self.real)
