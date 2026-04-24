@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - N order derivative computing
 - Hessian matrix function
 
-## [1.0.0] - 2026-X-X
+## [0.0.0] - 2026-4-24
 ### Added
 - Dual and Epsilon classes
 - Full trig, inverse trig, hyperbolic, inverse hyperbolic methods
