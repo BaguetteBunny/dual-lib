@@ -32,6 +32,9 @@ jobs:
           python -m pip install build
           python -m build
 
+      - name: Run Unit Testing
+        run: pytest tests/ -v
+
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
