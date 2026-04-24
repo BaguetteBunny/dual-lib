@@ -342,7 +342,7 @@ class Dual:
 
     def __pow__(self, other):
         if isinstance(other, (int, float)):
-            return Dual(self.real**other, self.dual * other * self.real**(other - 1))
+            return Dual(1, 0) if other == 0 else Dual(self.real**other, self.dual * other * self.real**(other - 1))
         if isinstance(other, Dual):
             real = self.real ** other.real
             return Dual(real, self.dual * other.real * self.real**(other.real - 1) + other.dual * real * M.log(self.real))
