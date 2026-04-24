@@ -1,4 +1,4 @@
-from typing import Iterable, Union
+from typing import Union
 import math as M
 
 Number = Union[int, float]
@@ -66,8 +66,8 @@ class Dual:
         ``Dual(x)`` where x is Dual
             Copy constructor. Returns a duplicate of x.
 
-        ``Dual(iterable)``
-            Constructs from any iterable of exactly two real numbers
+        ``Dual(C)`` where C is a list or a tuple
+            Constructs from any list or tuple of exactly two real numbers
             (int or float), interpreted as (real, dual).
             e.g. ``Dual([3, 4])`` → 3 + 4ε
 
@@ -223,7 +223,7 @@ class Dual:
                 elif isinstance(arg, (int, float)):
                     self.real = float(arg)
 
-                elif isinstance(arg, Iterable):
+                elif isinstance(arg, (list, tuple)):
                     items = list(arg)
                     if len(items) == 2 and all(_valid_input(x) for x in items): self.real, self.dual = float(items[0]), float(items[1])
                     else: raise ValueError("Iterable argument must contain exactly two real numbers.")
