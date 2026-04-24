@@ -4,13 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dual-number"
-dynamic = ["version"]
+dynamic = ["version", "readme"]
 requires-python = ">= 3.8"
 authors = [{name = "Louis Billaut", email = "louisbillaut30052007@gmail.com"}]
 license = "MIT"
 readme = "README.md"
 description = "Dual Number Library"
 keywords = ["dual", "derivative", "differentiation", "epsilon"]
+
+[tool.setuptools.dynamic]
+version = {attr = "dual.__version__"}
+readme = {file = "README.md", content-type = "text/markdown"}
 
 [project.urls]
 Repository = "https://github.com/BaguetteBunny/dual-lib"
