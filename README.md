@@ -30,15 +30,13 @@ for any differentiable function f. This means evaluating a function on a dual nu
 Clone the repository and install in editable mode:
  
 ```bash
-git clone https://github.com/BaguetteBunny/dual-numbers.git
-cd dual-numbers
-pip install -e .
+pip install dual-number
 ```
  
 Then in your code:
  
 ```python
-from dual import Dual, Epsilon, derivative, gradient, jacobian
+from dual-number import Dual, Epsilon, derivative, gradient, jacobian
 ```
  
 ---
@@ -46,7 +44,7 @@ from dual import Dual, Epsilon, derivative, gradient, jacobian
 ## Quick Start
  
 ```python
-from dual import Dual, Epsilon, derivative, gradient, jacobian
+from dual-number import Dual, Epsilon, derivative, gradient, jacobian
  
 # --- Basic construction ---
 x = Dual(3, 1)       # 3 + 1ε  (seed for differentiation at x=3)
@@ -147,7 +145,7 @@ Their inverse, hyperbolic, and hyperbolic inverses are fully supported.
 `Epsilon` is a convenience subclass of `Dual` representing the pure dual unit ε = 0 + 1ε:
  
 ```python
-from dual import Epsilon
+from dual-number import Epsilon
  
 e = Epsilon()      # Dual(0, 1)
  
@@ -172,7 +170,7 @@ All calculus helpers live in `dual.calculus` and are exported from `dual` direct
 Computes the exact derivative of a scalar function at a point:
  
 ```python
-from dual import derivative
+from dual-number import derivative
  
 derivative(lambda x: x**3,   2.0)   # 12.0   ← 3x² at x=2
 derivative(lambda x: x.sin(), 0.0)  # 1.0    ← cos(0)
@@ -184,7 +182,7 @@ derivative(lambda x: x.exp(), 1.0)  # 2.718  ← eˣ at x=1
 Computes all partial derivatives of a scalar-valued function, one forward pass per variable:
  
 ```python
-from dual import gradient
+from dual-number import gradient
  
 # f(x, y) = x² + xy,  ∂f/∂x = 2x+y,  ∂f/∂y = x
 gradient(lambda x, y: x**2 + x*y, 3, 4)
@@ -196,7 +194,7 @@ gradient(lambda x, y: x**2 + x*y, 3, 4)
 Computes the full m×n Jacobian matrix of a vector-valued function:
  
 ```python
-from dual import jacobian
+from dual-number import jacobian
  
 # f: R³ → R³
 f = lambda x, y, z: (x**2 + y + z,  x*y,  z + x)
@@ -222,7 +220,7 @@ Dual number differentiation is **exact to float64 precision** (~15–16 signific
  
 ```python
 import math as M
-from dual import derivative
+from dual-number import derivative
  
 x = 1.5
 h = 1e-7
