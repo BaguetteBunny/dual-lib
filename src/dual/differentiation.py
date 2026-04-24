@@ -1,6 +1,9 @@
 from .core import Dual
+from typing import Callable, Union
 
-def derivative(f, x) -> float:
+Number = Union[int, float]
+
+def derivative(f: Callable, x: Number) -> float:
     """
     Compute the derivative of a scalar function at a point using dual numbers.
 
@@ -27,7 +30,7 @@ def derivative(f, x) -> float:
     """
     return f(Dual(x, 1)).dual
 
-def gradient(f, *args) -> list[float]:
+def gradient(f: Callable, *args: Number) -> list[float]:
     """
     Compute the gradient of a scalar function at a point using dual numbers.
 
@@ -57,7 +60,7 @@ def gradient(f, *args) -> list[float]:
                 for j, a in enumerate(args)]).dual
             for i in range(len(args))]
 
-def jacobian(f, *args) -> list[list[float]]:
+def jacobian(f: Callable, *args: Number) -> list[list[float]]:
     """
     Compute the Jacobian matrix of a vector function at a point using dual numbers.
 
@@ -94,3 +97,51 @@ def jacobian(f, *args) -> list[list[float]]:
                       for j, a in enumerate(args)])
         rows.append([out.dual for out in outputs])
     return rows
+
+def implicit_derivative(F: Callable, x: Number, y: Number) -> float:
+    """Compute dy/dx for an implicit function F(x, y) = 0.
+
+    Uses the implicit differentiation formula dy/dx = -(∂F/∂x) / (∂F/∂y),
+    computing both partial derivatives via dual numbers in two forward passes.
+
+    Parameters
+    ----------
+    F : callable
+        A function of two variables representing the implicit equation F(x, y) = 0.
+        Must be written using Dual-compatible operations.
+    x : int or float
+        The x-coordinate of the point at which to evaluate dy/dx.
+    y : int or float
+        The y-coordinate of the point at which to evaluate dy/dx.
+
+    Returns
+    -------
+    float
+        The derivative dy/dx at the point (x, y).
+
+    Raises
+    ------
+    ZeroDivisionError
+        If ∂F/∂y = 0 at the given point, meaning the implicit function
+        theorem does not apply there.
+
+    Examples
+    --------
+    Unit circle x² + y² = 1, dy/dx = -x/y:
+
+    >>> F = lambda x, y: x**2 + y**2 - 1
+    >>> implicit_derivative(F, 0.5, M.sqrt(0.75))
+    -0.5773...   ← -x/y = -0.5/√0.75  ✓
+
+    Ellipse x²/4 + y²/9 = 1, dy/dx = -9x/4y:
+
+    >>> F = lambda x, y: x**2/4 + y**2/9 - 1
+    >>> implicit_derivative(F, 1.0, 1.5*M.sqrt(3))
+    -0.8660...   ✓
+    """
+    dF_dx = F(Dual(x, 1), Dual(y, 0)).dual
+    dF_dy = F(Dual(x, 0), Dual(y, 1)).dual
+
+    if dF_dy == 0: raise ZeroDivisionError(f"∂F/∂y = 0 at ({x}, {y}) thus implicit function theorem does not apply.")
+
+    return -dF_dx / dF_dy

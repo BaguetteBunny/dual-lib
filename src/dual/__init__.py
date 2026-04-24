@@ -1,5 +1,5 @@
 from .core import Dual, Epsilon
-from .differentiation import derivative, gradient, jacobian
+from .differentiation import derivative, gradient, jacobian, implicit_derivative
 
 __all__ = [
     "Dual",
@@ -7,6 +7,7 @@ __all__ = [
     "derivative",
     "gradient",
     "jacobian",
+    "implicit_derivative"
 ]
 
 __version__ = "0.0.1"
