@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - N order derivative computing
 - Hessian matrix function
 
+## [0.0.1] - 2026-4-24
+- Fixed error handling for certain methods
+- Fixed simple mistakes inside README.md
+
 ## [0.0.0] - 2026-4-24
 ### Added
 - Dual and Epsilon classes
