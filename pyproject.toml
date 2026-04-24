@@ -14,6 +14,7 @@ keywords = ["dual", "derivative", "differentiation", "epsilon"]
 
 [project.urls]
 Repository = "https://github.com/BaguetteBunny/dual-lib"
+Package Index = "https://pypi.org/project/dual-number/"
 Documentation = "https://github.com/BaguetteBunny/dual-lib/blob/main/README.md"
 Changelog = "https://github.com/BaguetteBunny/dual-lib/blob/main/CHANGELOG.md"
 Issues = "https://github.com/BaguetteBunny/dual-lib/issues"
