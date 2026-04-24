@@ -1,4 +1,4 @@
-# dual
+# dual-number
 > Exact, algebraic automatic differentiation via dual numbers for Python.
  
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)

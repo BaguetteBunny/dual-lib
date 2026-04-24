@@ -2,6 +2,6 @@ __pycache__
 .vscode
 .pytest_cache
 dist
-dual.egg-info
+dual_number.egg-info
 
 temp.py
