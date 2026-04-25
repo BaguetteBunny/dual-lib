@@ -32,7 +32,6 @@ def test_rsub():
     assert x.dual == pytest.approx(-1.0)
 
 def test_mul_dual_dual():
-    # (3+1ε)(4+2ε) = 12 + (3·2 + 1·4)ε = 12 + 10ε
     x = Dual(3, 1) * Dual(4, 2)
     assert x.real == pytest.approx(12.0)
     assert x.dual == pytest.approx(10.0)
@@ -63,7 +62,6 @@ def test_rtruediv():
     assert x.dual == pytest.approx(-6 / 3**2)
 
 def test_pow_scalar():
-    # d/dx x³ at x=2 → 3·2² = 12
     x = Dual(2, 1) ** 3
     assert x.real == pytest.approx(8.0)
     assert x.dual == pytest.approx(12.0)
@@ -79,14 +77,12 @@ def test_pow_eps_zero():
     assert x.dual == pytest.approx(0.0)
 
 def test_pow_dual():
-    # X^Y = a^c + (bc·a^(c-1) + d·a^c·ln(a))ε
     x = Dual(2, 1) ** Dual(3, 1)
     import math as M
     assert x.real == pytest.approx(8.0)
     assert x.dual == pytest.approx(1*3*2**2 + 1*8*M.log(2))
 
 def test_rpow():
-    # k^X, dual = b·k^a·ln(k)
     import math as M
     x = 2 ** Dual(3, 1)
     assert x.real == pytest.approx(8.0)
@@ -110,7 +106,7 @@ def test_rfloordiv():
 def test_mod_dual_scalar():
     x = Dual(7, 3) % 2
     assert x.real == pytest.approx(1.0)
-    assert x.dual == pytest.approx(3.0)  # dual survives unchanged
+    assert x.dual == pytest.approx(3.0)
 
 def test_mod_dual_dual():
     x = Dual(7, 3) % Dual(2, 1)
@@ -118,7 +114,6 @@ def test_mod_dual_dual():
     assert x.dual == pytest.approx(3 - 1 * (7 // 2))
 
 def test_rmod():
-    # k % X, dual = -floor(k/a) * b   NOT -(k/a)*b
     x = 7 % Dual(2, 3)
     assert x.real == pytest.approx(1.0)
     assert x.dual == pytest.approx(-(7 // 2) * 3)

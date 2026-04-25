@@ -13,19 +13,16 @@ def test_pow_consistent_with_mul():
     assert (x**2).dual == pytest.approx((x*x).dual)
 
 def test_chain_rule_sin_x_squared():
-    # d/dx sin(x²) = 2x·cos(x²)
     x = Dual(1.5, 1)
     result = (x**2).sin()
     assert result.dual == pytest.approx(2 * 1.5 * M.cos(1.5**2))
 
 def test_product_rule():
-    # d/dx (x·sin(x)) = sin(x) + x·cos(x)
     x = Dual(1.2, 1)
     result = x * x.sin()
     assert result.dual == pytest.approx(M.sin(1.2) + 1.2 * M.cos(1.2))
 
 def test_quotient_rule():
-    # d/dx (sin(x)/cos(x)) = 1/cos²(x)
     x = Dual(1.2, 1)
     result = x.sin() / x.cos()
     assert result.dual == pytest.approx(1 / M.cos(1.2)**2)
@@ -36,7 +33,6 @@ def test_eps_squared_zero():
     assert (e**2).dual == pytest.approx(0.0)
 
 def test_accuracy_vs_finite_diff():
-    # dual should match analytical, finite diff should not
     x = 1.5
     h = 1e-7
     fd = (M.sin((x+h)**2) - M.sin(x**2)) / h
