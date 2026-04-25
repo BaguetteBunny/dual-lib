@@ -3,8 +3,8 @@ import math as M
 
 Number = Union[int, float]
 
-def _valid_input(val) -> bool:
-    return isinstance(val, (int, float))
+def _valid_input(x: Number) -> bool:
+    return isinstance(x, (int, float))
 
 def _round_diff(x: Number) -> int:
     if x == 0.5: raise ValueError("round() dual part undefined for real part half integer (Dirac Delta)")
@@ -526,7 +526,7 @@ class Epsilon(Dual):
     arithmetic and mathematical operations unchanged. It exists purely for
     notational clarity and convenience.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.real = 0
         self.dual = 1
 
