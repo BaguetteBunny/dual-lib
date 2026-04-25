@@ -12,8 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complex number support
 - W Lambert Function compat
 - Gudermannian Function compat
-- N order derivative computing
+- Hyperdual class for second derivative computation
 - Hessian matrix function
+
+## [0.1.0] - 2026-4-26
+### Added
+- Pytest unit testing
+- Implicit differentiation function
+- Proper type hints to certain functions
 
 ## [0.0.1] - 2026-4-24
 ### Fixed
