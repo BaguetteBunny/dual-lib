@@ -98,50 +98,57 @@ def jacobian(f: Callable, *args: Number) -> list[list[float]]:
         rows.append([out.dual for out in outputs])
     return rows
 
-def implicit_derivative(F: Callable, x: Number, y: Number) -> float:
-    """Compute dy/dx for an implicit function F(x, y) = 0.
+def implicit_derivative(F: Callable, *args: Number) -> list[float]:
+    """Compute all implicit partial derivatives for F(x₁, x₂, ..., xₙ) = 0.
 
-    Uses the implicit differentiation formula dy/dx = -(∂F/∂x) / (∂F/∂y),
-    computing both partial derivatives via dual numbers in two forward passes.
+    Treats the last argument as the dependent variable and computes its
+    partial derivative with respect to each of the other variables using
+    the implicit differentiation formula:
+
+        ∂xₙ/∂xᵢ = -(∂F/∂xᵢ) / (∂F/∂xₙ)
 
     Parameters
     ----------
     F : callable
-        A function of two variables representing the implicit equation F(x, y) = 0.
+        An implicit function of n variables, F(x₁, ..., xₙ) = 0.
         Must be written using Dual-compatible operations.
-    x : int or float
-        The x-coordinate of the point at which to evaluate dy/dx.
-    y : int or float
-        The y-coordinate of the point at which to evaluate dy/dx.
+    *args : int or float
+        The point (x₁, x₂, ..., xₙ) at which to evaluate the derivatives.
 
     Returns
     -------
-    float
-        The derivative dy/dx at the point (x, y).
+    list[float]
+        A list of n-1 partial derivatives [∂xₙ/∂x₁, ∂xₙ/∂x₂, ..., ∂xₙ/∂xₙ₋₁].
 
     Raises
     ------
     ZeroDivisionError
-        If ∂F/∂y = 0 at the given point, meaning the implicit function
-        theorem does not apply there.
+        If ∂F/∂xₙ = 0 at the given point.
+    ValueError
+        If fewer than 2 arguments are provided.
 
     Examples
     --------
-    Unit circle x² + y² = 1, dy/dx = -x/y:
+    Unit circle F(x, y) = x² + y² - 1, dy/dx = -x/y:
 
-    >>> F = lambda x, y: x**2 + y**2 - 1
-    >>> implicit_derivative(F, 0.5, M.sqrt(0.75))
-    -0.5773...   ← -x/y = -0.5/√0.75  ✓
+    >>> implicit_derivative_n(lambda x, y: x**2 + y**2 - 1, 0.5, M.sqrt(0.75))
+    [-0.5773...]   ← list with one entry since n=2
 
-    Ellipse x²/4 + y²/9 = 1, dy/dx = -9x/4y:
+    Sphere F(x, y, z) = x² + y² + z² - 1:
 
-    >>> F = lambda x, y: x**2/4 + y**2/9 - 1
-    >>> implicit_derivative(F, 1.0, 1.5*M.sqrt(3))
-    -0.8660...   ✓
+    >>> F = lambda x, y, z: x**2 + y**2 + z**2 - 1
+    >>> implicit_derivative_n(F, 0.5, 0.5, 1/M.sqrt(2))
+    [-0.7071..., -0.7071...]   ← [∂z/∂x, ∂z/∂y]
     """
-    dF_dx = F(Dual(x, 1), Dual(y, 0)).dual
-    dF_dy = F(Dual(x, 0), Dual(y, 1)).dual
+    n = len(args)
+    if n < 2: raise ValueError("implicit_derivative_n requires at least 2 arguments.")
 
-    if dF_dy == 0: raise ZeroDivisionError(f"∂F/∂y = 0 at ({x}, {y}) thus implicit function theorem does not apply.")
+    dF_dxn = F(*[Dual(a, 1) if i == n-1 else Dual(a, 0) for i, a in enumerate(args)]).dual
+    if dF_dxn == 0: raise ZeroDivisionError(f"∂F/∂x{n} = 0 at {args} thus implicit function theorem does not apply.")
 
-    return -dF_dx / dF_dy
+    result = []
+    for i in range(n - 1):
+        dF_dxi = F(*[Dual(a, 1) if j == i else Dual(a, 0) for j, a in enumerate(args)]).dual
+        result.append(-dF_dxi / dF_dxn)
+
+    return result
