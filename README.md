@@ -3,7 +3,7 @@
  
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.0.1-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](CHANGELOG.md)
  
 ---
  
