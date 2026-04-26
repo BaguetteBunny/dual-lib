@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implicit differentiation function
 - Proper type hints to certain functions
 
+### Fixed
+- floor() and ceil() methods not being accurate
+
 ## [0.0.1] - 2026-4-24
 ### Fixed
 - Wrong error handling for certain methods

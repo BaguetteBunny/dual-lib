@@ -10,14 +10,6 @@ def _round_diff(x: Number) -> int:
     if x == 0.5: raise ValueError("round() dual part undefined for real part half integer (Dirac Delta)")
     return 0
 
-def _floor_diff(x: Number) -> int:
-    if x == int(x): raise ValueError("floor() dual part undefined for real part integer (Dirac Delta)")
-    return 0
-
-def _ceil_diff(x: Number) -> int:
-    if x == int(x): raise ValueError("ceil() dual part undefined for real part integer (Dirac Delta)")
-    return 0
-
 def _sign(x: Number) -> int:
     if x == 0: raise ValueError("sign() dual part undefined when real part is 0 (Dirac Delta)")
     return (x > 0) - (x < 0)
@@ -422,9 +414,13 @@ class Dual:
     def __hash__(self) -> int:
         return hash((self.real, self.dual))
     
-    def ceil(self) -> "Dual": return Dual(M.ceil(self.real), _ceil_diff(self.dual))
+    def ceil(self) -> "Dual":
+        if self.real == int(self.real): raise ValueError("ceil() dual part undefined at integer real part (Dirac delta)")
+        return Dual(M.ceil(self.real), 0)
 
-    def floor(self) -> "Dual": return Dual(M.floor(self.real), _floor_diff(self.dual))
+    def floor(self) -> "Dual":
+        if self.real == int(self.real): raise ValueError("floor() dual part undefined at integer real part (Dirac delta)")
+        return Dual(M.floor(self.real), 0)
 
     def __round__(self, ndigits = None) -> "Dual": return Dual(round(self.real, ndigits), _round_diff(self.dual))
 
