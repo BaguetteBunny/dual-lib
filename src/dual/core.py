@@ -510,6 +510,50 @@ class Dual:
 
     def astuple(self) -> tuple: return self.real, self.dual
 
+    # Numpy Compat
+
+    def __array__(self, dtype=None):
+        """Allow np.array(dual) by stripping to real part."""
+        try: import numpy as np
+        except ImportError: return NotImplemented
+
+        return np.array(self.real, dtype=dtype)
+
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        """Intercept numpy ufuncs like np.sin, np.exp, np.add on Dual numbers."""
+        try: import numpy as np
+        except ImportError: return NotImplemented
+
+        if method != "__call__":
+            return NotImplemented
+
+        UFUNC_MAP = {
+            np.sin:     lambda x: x.sin(),
+            np.cos:     lambda x: x.cos(),
+            np.tan:     lambda x: x.tan(),
+            np.exp:     lambda x: x.exp(),
+            np.log:     lambda x: x.log(),
+            np.sqrt:    lambda x: x ** 0.5,
+            np.absolute:lambda x: abs(x),
+            np.negative:lambda x: -x,
+            np.positive:lambda x: +x,
+            np.add:      lambda x, y: x + y,
+            np.subtract: lambda x, y: x - y,
+            np.multiply: lambda x, y: x * y,
+            np.true_divide: lambda x, y: x / y,
+            np.floor_divide: lambda x, y: x // y,
+            np.power:    lambda x, y: x ** y,
+            np.mod:      lambda x, y: x % y,
+            np.equal:    lambda x, y: x == y,
+            np.less:     lambda x, y: x < y,
+            np.less_equal: lambda x, y: x <= y,
+        }
+
+        if ufunc not in UFUNC_MAP: return NotImplemented
+
+        unwrapped = [ i if isinstance(i, Dual) else Dual(float(i)) for i in inputs ]
+        return UFUNC_MAP[ufunc](*unwrapped)
+
 class Epsilon(Dual):
     """
     The pure dual unit ε, representing the dual number 0 + 1ε.
