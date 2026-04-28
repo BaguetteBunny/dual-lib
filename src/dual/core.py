@@ -581,6 +581,8 @@ class Dual:
 
         unwrapped = [ i if isinstance(i, Dual) else Dual(float(i)) for i in inputs ]
         return UFUNC_MAP[ufunc](*unwrapped)
+    
+    __array_priority__ = 20.0
 
 class Epsilon(Dual):
     """
