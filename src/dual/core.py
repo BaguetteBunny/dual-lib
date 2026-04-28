@@ -517,15 +517,17 @@ class Dual:
 
     def astuple(self) -> tuple: return self.real, self.dual
 
-    # Numpy Compat
+    # Module Compat
 
-    # Add Aliases for Numpy
+    # Arc Alias
     arcsin = asin
     arccos = acos
     arctan = atan
     arcsinh = asinh
     arccosh = acosh
     arctanh = atanh
+
+    # Numpy Compat
 
     # Override Numpy Builtin
 
@@ -539,6 +541,9 @@ class Dual:
 
     try:
         import numpy as np
+
+        @_implements(np.real)
+        def dual_real(a, **kwargs): return a.real
 
         @_implements(np.sum)
         def dual_sum(a, **kwargs):
@@ -559,13 +564,6 @@ class Dual:
 
     # Override Numpy Array Functions
 
-    def __array__(self, dtype=None):
-        """Allow np.array(dual) by stripping to real part."""
-        try: import numpy as np
-        except ImportError: return NotImplemented
-
-        return np.array(self.real, dtype=dtype)
-
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         """Intercept numpy ufuncs like np.sin, np.exp, np.add on Dual numbers."""
         try: import numpy as np
@@ -577,21 +575,15 @@ class Dual:
             np.sin: lambda x: x.sin(),
             np.cos: lambda x: x.cos(),
             np.tan: lambda x: x.tan(),
-            np.arcsin: lambda x: x.asin(),
             np.asin: lambda x: x.asin(),
-            np.arccos: lambda x: x.acos(),
             np.acos: lambda x: x.acos(),
-            np.arctan: lambda x: x.atan(),
             np.atan: lambda x: x.atan(),
             #np.arctan2:      lambda y, x: 
             np.sinh: lambda x: x.sinh(),
             np.cosh: lambda x: x.cosh(),
             np.tanh: lambda x: x.tanh(),
-            np.arcsinh: lambda x: x.asinh(),
             np.asinh: lambda x: x.asinh(),
-            np.arccosh: lambda x: x.acosh(),
             np.acosh: lambda x: x.acosh(),
-            np.arctanh: lambda x: x.atanh(),
             np.atanh: lambda x: x.atanh(),
             np.exp: lambda x: x.exp(),
             np.exp2: lambda x: Dual(2) ** x,
@@ -631,7 +623,6 @@ class Dual:
             np.isfinite: lambda x: M.isfinite(x.real) and M.isfinite(x.dual),
             np.isnan: lambda x: M.isnan(x.real) or M.isnan(x.dual),
             np.isinf: lambda x: M.isinf(x.real) or M.isinf(x.dual),
-            np.real: lambda x: x.real,
         }
 
         if ufunc not in UFUNC_MAP: return NotImplemented
