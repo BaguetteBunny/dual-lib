@@ -25,5 +25,8 @@ Documentation = "https://github.com/BaguetteBunny/dual-lib/blob/main/README.md"
 Changelog = "https://github.com/BaguetteBunny/dual-lib/blob/main/CHANGELOG.md"
 Issues = "https://github.com/BaguetteBunny/dual-lib/issues"
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
