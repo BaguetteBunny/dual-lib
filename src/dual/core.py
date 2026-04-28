@@ -575,6 +575,8 @@ class Dual:
             np.less_equal:   lambda x, y: x <= y,
             np.greater:      lambda x, y: x >  y,
             np.greater_equal:lambda x, y: x >= y,
+            np.real: lambda x: x.real,
+            np.imag: lambda x: x.dual,
         }
 
         if ufunc not in UFUNC_MAP: return NotImplemented
