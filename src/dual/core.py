@@ -1,15 +1,7 @@
 from typing import Union
 import math as M
-import warnings
 
 Number = Union[int, float]
-
-_HANDLED_NP_FUNC = {}
-def _implements(np_function):
-    def decorator(func):
-        _HANDLED_NP_FUNC[np_function] = func
-        return func
-    return decorator
 
 def _valid_input(x: Number) -> bool:
     return isinstance(x, (int, float))
@@ -207,11 +199,6 @@ class Dual:
     gradient : Compute ∇f at a point using dual numbers.
     jacobian : Compute the Jacobian matrix of a vector function.
     """
-    @property
-    def imag(self) -> float:
-        warnings.warn("Dual.imag is a numpy compatibility alias for Dual.dual. Please use .dual instead.", UserWarning, stacklevel = 2)
-        return self.dual
-
     def __init__(self, *args) -> None:
         self.real: float = 0.0
         self.dual: float = 0.0
@@ -523,120 +510,6 @@ class Dual:
 
     def astuple(self) -> tuple: return self.real, self.dual
 
-    # Numpy Compat
-    # Override Numpy Builtin
-
-    def __array_function__(self, func, types, args, kwargs):
-        try: import numpy as np
-        except ImportError: return NotImplemented
-
-        if func not in _HANDLED_NP_FUNC:
-            return NotImplemented
-        return  _HANDLED_NP_FUNC[func](*args, **kwargs)
-
-    try:
-        import numpy as np
-
-        @_implements(np.sum)
-        def dual_sum(a, **kwargs):
-            return sum(a)
-
-        @_implements(np.mean)
-        def dual_mean(a, **kwargs):
-            return sum(a) / len(a)
-
-        @_implements(np.prod)
-        def dual_prod(a, **kwargs):
-            result = Dual(1)
-            for x in a:
-                result *= x
-            return result
-                
-    except ImportError: pass
-
-    # Override Numpy Array Functions
-
-    def __array__(self, dtype=None):
-        """Allow np.array(dual) by stripping to real part."""
-        try: import numpy as np
-        except ImportError: return NotImplemented
-
-        return np.array(self.real, dtype=dtype)
-
-    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-        """Intercept numpy ufuncs like np.sin, np.exp, np.add on Dual numbers."""
-        try: import numpy as np
-        except ImportError: return NotImplemented
-
-        if method != "__call__": return NotImplemented
-
-        UFUNC_MAP = {
-            np.sin: lambda x: x.sin(),
-            np.cos: lambda x: x.cos(),
-            np.tan: lambda x: x.tan(),
-            np.arcsin: lambda x: x.asin(),
-            np.asin: lambda x: x.asin(),
-            np.arccos: lambda x: x.acos(),
-            np.acos: lambda x: x.acos(),
-            np.arctan: lambda x: x.atan(),
-            np.atan: lambda x: x.atan(),
-            #np.arctan2:      lambda y, x: 
-            np.sinh: lambda x: x.sinh(),
-            np.cosh: lambda x: x.cosh(),
-            np.tanh: lambda x: x.tanh(),
-            np.arcsinh: lambda x: x.asinh(),
-            np.asinh: lambda x: x.asinh(),
-            np.arccosh: lambda x: x.acosh(),
-            np.acosh: lambda x: x.acosh(),
-            np.arctanh: lambda x: x.atanh(),
-            np.atanh: lambda x: x.atanh(),
-            np.exp: lambda x: x.exp(),
-            np.exp2: lambda x: Dual(2) ** x,
-            np.log: lambda x: x.log(),
-            np.log2: lambda x: x.log(2),
-            np.log10: lambda x: x.log(10),
-            np.log1p: lambda x: (x + 1).log(),
-            np.expm1: lambda x: x.exp() - 1,
-            np.sqrt: lambda x: x ** 0.5,
-            np.cbrt: lambda x: x ** (1/3),
-            np.square: lambda x: x ** 2,
-            np.reciprocal: lambda x: Dual(1) / x,
-            np.absolute: lambda x: abs(x),
-            np.sign: lambda x: x.sign(),
-            np.floor: lambda x: x.floor(),
-            np.ceil: lambda x: x.ceil(),
-            np.rint: lambda x: round(x),
-            np.fabs: lambda x: abs(x),
-            #np.hypot:        lambda x, y: 
-            np.add: lambda x, y: x + y,
-            np.subtract: lambda x, y: x - y,
-            np.multiply: lambda x, y: x * y,
-            np.true_divide: lambda x, y: x / y,
-            np.floor_divide: lambda x, y: x // y,
-            np.power: lambda x, y: x ** y,
-            np.mod: lambda x, y: x % y,
-            np.remainder: lambda x, y: x % y,
-            np.divmod: lambda x, y: divmod(x, y),
-            np.negative: lambda x: -x,
-            np.positive: lambda x: +x,
-            np.equal: lambda x, y: x == y,
-            np.not_equal: lambda x, y: x != y,
-            np.less: lambda x, y: x <  y,
-            np.less_equal: lambda x, y: x <= y,
-            np.greater: lambda x, y: x >  y,
-            np.greater_equal: lambda x, y: x >= y,
-            np.isfinite: lambda x: M.isfinite(x.real) and M.isfinite(x.dual),
-            np.isnan: lambda x: M.isnan(x.real) or M.isnan(x.dual),
-            np.isinf: lambda x: M.isinf(x.real) or M.isinf(x.dual),
-            np.real: lambda x: x.real,
-            np.imag: lambda x: x.dual,
-        }
-
-        if ufunc not in UFUNC_MAP: return NotImplemented
-
-        unwrapped = [ i if isinstance(i, Dual) else Dual(float(i)) for i in inputs ]
-        return UFUNC_MAP[ufunc](*unwrapped)
-    
     __array_priority__ = 20.0
 
 class Epsilon(Dual):
