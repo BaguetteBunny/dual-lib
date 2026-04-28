@@ -1,5 +1,6 @@
 from typing import Union
 import math as M
+import warnings
 
 Number = Union[int, float]
 
@@ -206,6 +207,11 @@ class Dual:
     gradient : Compute ∇f at a point using dual numbers.
     jacobian : Compute the Jacobian matrix of a vector function.
     """
+    @property
+    def imag(self) -> float:
+        warnings.warn("Dual.imag is a numpy compatibility alias for Dual.dual. Please use .dual instead.", UserWarning, stacklevel = 2)
+        return self.dual
+
     def __init__(self, *args) -> None:
         self.real: float = 0.0
         self.dual: float = 0.0
@@ -569,15 +575,21 @@ class Dual:
             np.cos: lambda x: x.cos(),
             np.tan: lambda x: x.tan(),
             np.arcsin: lambda x: x.asin(),
+            np.asin: lambda x: x.asin(),
             np.arccos: lambda x: x.acos(),
+            np.acos: lambda x: x.acos(),
             np.arctan: lambda x: x.atan(),
+            np.atan: lambda x: x.atan(),
             #np.arctan2:      lambda y, x: 
             np.sinh: lambda x: x.sinh(),
             np.cosh: lambda x: x.cosh(),
             np.tanh: lambda x: x.tanh(),
             np.arcsinh: lambda x: x.asinh(),
+            np.asinh: lambda x: x.asinh(),
             np.arccosh: lambda x: x.acosh(),
+            np.acosh: lambda x: x.acosh(),
             np.arctanh: lambda x: x.atanh(),
+            np.atanh: lambda x: x.atanh(),
             np.exp: lambda x: x.exp(),
             np.exp2: lambda x: Dual(2) ** x,
             np.log: lambda x: x.log(),
