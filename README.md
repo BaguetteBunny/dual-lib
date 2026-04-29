@@ -3,7 +3,7 @@
  
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](CHANGELOG.md)
  
 ---
  
@@ -232,6 +232,23 @@ exact       = M.cos(x**2) * 2 * x                     # -1.8845208681682175  ✓
 ```
  
 The dual result matches the analytical exact value to all 16 digits. The finite difference accumulates error from both the finite step size `h` and floating point cancellation when subtracting two close values.
+
+---
+
+## Compatibility
+
+This library is compatible with Numpy, specifically Numpy's Universal Functions.
+
+```python
+from dual-number import *
+import numpy as np
+
+A = Dual(0.5, 4)
+B = Dual(0.25, 1)
+ARRAY = np.array([A, B])
+print(np.cos(ARRAY))
+# [Dual(0.8775825618903728, -1.917702154416812) Dual(0.9689124217106447, -0.24740395925452294)]
+```
 
 ---
  

@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hyperdual class for second derivative computation
 - Hessian matrix function
 
+## [1.0.0] - 2026-4-29
+### Added
+- Numpy compatibility for ufuncs
+- Pytests to verify Numpy compat
+
 ## [0.1.0] - 2026-4-26
 ### Added
 - Pytest unit testing
