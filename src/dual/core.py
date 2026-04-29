@@ -541,10 +541,10 @@ class Dual:
 
     try:
         import numpy as np
-
+        
         @_implements(np.real)
         def __dual_real(a, **kwargs): 
-            warnings.warn("Use Dual.read method instead of Numpy's version.", UserWarning)
+            warnings.warn("Use Dual.real method instead of Numpy's version.", UserWarning)
             return a.real
                 
     except ImportError: pass
