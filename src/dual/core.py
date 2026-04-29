@@ -544,21 +544,6 @@ class Dual:
 
         @_implements(np.real)
         def dual_real(a, **kwargs): return a.real
-
-        @_implements(np.sum)
-        def dual_sum(a, **kwargs):
-            return sum(a)
-
-        @_implements(np.mean)
-        def dual_mean(a, **kwargs):
-            return sum(a) / len(a)
-
-        @_implements(np.prod)
-        def dual_prod(a, **kwargs):
-            result = Dual(1)
-            for x in a:
-                result *= x
-            return result
                 
     except ImportError: pass
 
