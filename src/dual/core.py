@@ -1,5 +1,6 @@
 from typing import Union
 import math as M
+import warnings
 
 Number = Union[int, float]
 
@@ -535,15 +536,16 @@ class Dual:
         try: import numpy as np
         except ImportError: return NotImplemented
 
-        if func not in _HANDLED_NP_FUNC:
-            return NotImplemented
+        if func not in _HANDLED_NP_FUNC: return NotImplemented
         return  _HANDLED_NP_FUNC[func](*args, **kwargs)
 
     try:
         import numpy as np
 
         @_implements(np.real)
-        def dual_real(a, **kwargs): return a.real
+        def __dual_real(a, **kwargs): 
+            warnings.warn("Use Dual.read method instead of Numpy's version.", UserWarning)
+            return a.real
                 
     except ImportError: pass
 
